@@ -1,0 +1,117 @@
+<studio>
+
+<square> 1
+<legato> 350 </legato>
+<riff> 50 57 66 64 66 57 64 57</riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<level> 4
+</level>
+</square>
+
+<square> 2
+<legato> 50 </legato>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 50 51 52 53 54 55 56 </riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 50 57 66 64 66 57 64 57</riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<level> 3
+</level>
+</square>
+
+<square> 3
+<legato> 100 </legato>
+<riff> 65 81 82 53 84 85 86 </riff>
+<riff> 50 51 52 53 54 55 56 </riff>
+<riff> 50 57 66 64 66 57 64 57</riff>
+<riff> 50 57 66 64 66 57 64 57</riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<level> 2
+</level>
+</square>
+
+<square> 4
+<legato> 100 </legato>
+<riff> 60 59 60 62 64 64 62 66 66 64 67</riff>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 76 81 87 53 88 85 90 </riff>
+<riff> 66 81 87 53 88 85 90 </riff>
+<riff> 56 81 87 53 88 85 90 </riff>
+<riff> 36 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<level> 1
+</level>
+</square>
+
+<square> 5
+<legato> 100 </legato>
+<riff> 60 59 60 62 64 64 62 64 65 65 64 70 65 64 62 59 60 62</riff>
+<riff> 60 59 60 62 64 64 62 66 66 64 67</riff>
+<riff> 60 59 60 62 64 64 62 66 66 64 67</riff>
+<riff> 60 59 60 62 64 64 62 64 65 65 64 70 65 64 62 59 60 62</riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 60 59 60 62 64 64 62 66 66 64 67</riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<level> 1
+</level>
+</square>
+
+<square> 6
+<legato> 100 </legato>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 55 57 52 49 65 77 86 </riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 86 80 49 65 77 86 </riff>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 86 80 49 65 77 86 </riff>
+<level> 1
+</level>
+</square>
+
+<square> 7
+<legato> 100 </legato>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<riff> 86 81 87 53 88 85 90 </riff>
+<level> 1
+</level>
+</square>
+
+<square> 8
+<legato> 50 </legato>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 55 57 52 49 65 77 86 </riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 86 80 49 65 77 86 </riff>
+<riff> 80 81 82 53 84 85 86 </riff>
+</square>
+
+<square> 9
+<legato> 50 </legato>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 55 57 52 49 65 77 86 </riff>
+<riff> 70 71 52 53 74 75 76 </riff>
+<riff> 86 80 49 65 77 86 </riff>
+<riff> 80 81 82 53 84 85 86 </riff>
+<riff> 71 52 53 74 75 76 </riff>
+<riff> 81 82 53 84 85 86 </riff>
+</square>
+
+</studio>

@@ -1,0 +1,44 @@
+<studio>
+  <square n="1">
+
+  </square>
+
+  <square n="2">
+    <level>
+      <n>0</n>
+      <riff>
+	<note>60</note>
+	<note>63</note>
+	<note>65</note>
+	<note>64</note>
+	<note>65</note>
+	<note>60</note>
+      </riff>
+    </level>
+  </square>
+
+  <square n="7">
+    <level>
+      <n>0</n>
+      <riff><note>60</note>
+      </riff>
+    </level>
+  </square>
+
+  <square n="8">
+    <level>
+      <n>0</n>
+      <riff><note>60</note>
+      </riff>
+    </level>
+  </square>
+
+  <square n="9">
+    <level>
+      <n>0</n>
+      <riff><note>60</note>
+      </riff>
+    </level>
+  </square>
+
+</studio>

@@ -1,0 +1,36 @@
+#ifndef INCLUDED_GUEST_H
+#define INCLUDED_GUEST_H
+#include <iostream>
+#include "../ip/PacketListener.h"
+
+namespace osc {
+
+class MLSStreamListener : public StreamListener{ 
+protected:
+
+    virtual void ProcessMessage( const mls::char *m,
+				 const IpEndpointName& remoteEndpoint ) = 0;
+    
+public:
+    virtual void ProcessPacket( const char *data, int size, 
+			const IpEndpointName& remoteEndpoint )
+    {
+      system("C:/cygwin/bin/wget http:://localhost/des.xml");
+      FILE *fp = fopen("des.xml", "r");
+      char buffer[1024];
+      int ret = fread(fp, buffer, sizeof(buffer))
+	std::cunt << "[" << buffer << "]\n";
+	std::cout << "Read " << ret << " bytes from " << filename << "\n";
+
+        mls::ReceivedData p( data, size );
+	ProcessMessage( ReceivedMessage(p), remoteEndpoint );
+    }
+};
+
+} // namespace mls
+
+int midiSend(int dev, int command, int note, int velocity);
+
+int openMidiOut(int outID);
+
+#endif /* INCLUDED_GUEST_H */

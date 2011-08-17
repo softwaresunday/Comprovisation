@@ -1,0 +1,97 @@
+/* 
+ * Process received OSC messages using oscpack.
+ *   play sound palette.
+ */
+#include <iostream>
+
+#include "../osc/OscReceivedElements.h"
+#include "../osc/OscPacketListener.h"
+#include "../ip/UdpSocket.h"
+
+#include "Guest.h"
+
+
+#define PORT 7000
+
+class ExamplePacketListener : public osc::OscPacketListener {
+protected:
+
+    virtual void ProcessMessage( const osc::ReceivedMessage& m,
+				 const IpEndpointName& remoteEndpoint )
+    {
+      osc::ReceivedMessageArgumentStream args = m.ArgumentStream();
+      osc::int32 a1;
+      osc::int32 a2;
+      args >> a1 >> a2 >> osc::EndMessage;
+//    std::cout << m.AddressPattern() <<"("<<a1<<","<<a2<<")\n";
+      midiSend(0, 0x90, 60 + a1 + a2, 127);
+    }
+};
+
+static char word[128];
+static char final[128];
+
+char *getNext(FILE *fp)
+{
+  fscanf(fp, "%s", word);
+  int i;
+  for(i=0;i<128;i++) final[0] = 0;
+  i = 1;
+  char *cp = word;
+  if (*cp == '<')
+    {
+      cp++;
+      if (*cp == '/')
+	{
+	  strcpy(final, "end ");
+	  cp++;
+          i = 2;
+	}
+      while(*cp != 0) 
+	{
+	  if(*cp == '>' || *cp == ' ')
+	    {
+	      *cp = 0;
+	    }
+	  cp++;
+	}
+      strcat(final, &word[i]);
+    }
+  else
+    {
+      strcpy(final, word);
+    }
+  return final;
+}
+
+int readDesign(char *design)
+{
+  char buffer[1024];
+  char *dodad = &buffer[0];
+
+  FILE *fp = fopen(design, "r");
+  int i = 0;
+  while(!feof(fp))
+    {
+      std::cout << i++ << "[" << getNext(fp) << "]\n";
+    }
+}
+
+
+int main(int argc, char* argv[])
+{
+    ExamplePacketListener listener;
+    UdpListeningReceiveSocket s(
+            IpEndpointName( IpEndpointName::ANY_ADDRESS, PORT ),
+            &listener );
+
+    readDesign("design.xml");
+
+    openMidiOut(0);
+    std::cout << "press ctrl-c to end\n";
+
+    s.RunUntilSigInt();
+    return 0;
+}
+
+                

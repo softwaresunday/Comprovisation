@@ -1,0 +1,16 @@
+#include <iostream>
+#include <stdlib.h>
+
+int main(int argc, char* argv[])
+{
+  char v;
+  while(1)
+    {
+      Sleep(4);
+      std::cout << "before cin\n";
+      cin >> v;
+      std::cout << "after cin\n";
+      std::cout << "V is " << v << "]\n";
+    }
+     
+}

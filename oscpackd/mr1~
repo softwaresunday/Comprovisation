@@ -1,0 +1,7 @@
+g++ examples/SimpleReceive.cpp osc/OscTypes.cpp osc/OscReceivedElements.cpp ip/win32/NetworkingUtils.cpp ip/win32/UdpSocket.cpp -Wall -I. -lws2_32
+-lwinmm -o rec
+
+
+
+
+
