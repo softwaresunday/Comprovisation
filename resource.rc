@@ -1,0 +1,12 @@
+#include "resource.h"
+
+IDI_FFTICON ICON "fft.ico"
+
+IDB_DIGIT1            BITMAP  DISCARDABLE     "digit1.bmp"
+IDB_DIGIT2            BITMAP  DISCARDABLE     "digit2.bmp"
+IDB_DIGIT3            BITMAP  DISCARDABLE     "digit3.bmp"
+IDB_DIGIT4            BITMAP  DISCARDABLE     "digit4.bmp"
+IDB_DIGIT5            BITMAP  DISCARDABLE     "digit5.bmp"
+IDB_DIGIT6            BITMAP  DISCARDABLE     "digit6.bmp"
+IDB_DIGIT7            BITMAP  DISCARDABLE     "digit6.bmp"
+
