@@ -1,0 +1,50 @@
+:- module(notes, [ range/3,
+		   in_range/2,
+	   	   note_name/2,
+		   writeNotes/1,
+	 	   set_range/1 ]).
+
+:- dynamic wide/0, normal/0, high/0, low/0.
+
+% Create MIDI note facts including the #/b aliases.
+% note_name('C0', 12).
+% note_name('C#0',13).
+% note_name('Db0',13).
+% ...
+% note_name('B10',143)
+
+:- ensure_loaded(table).  % Term expansion for table/3
+
+table(note_name, 12,
+    [ ['C', ['C#','Db'], 'D', ['D#','Eb'], 'E', 'F',['F#','Gb'],
+       'G', ['G#','Ab'], 'A', ['A#','Bb'], 'B'],
+    [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ] ]).
+
+
+set_range(R) :-
+	retractall(normal),
+	retractall(wide),
+	retractall(high),
+	retractall(low),
+	assert(R).
+
+% Where each voice begins and ends
+range(s, 60, 77) :- normal.
+range(a, 57, 73) :- normal.
+range(t, 53, 71) :- normal.
+range(b, 48, 60) :- normal.
+
+range(s, 60, 87) :- wide.
+range(a, 53, 83) :- wide.
+range(t, 40, 71) :- wide.
+range(b, 33, 60) :- wide.
+
+in_range(Voice, Note) :-
+	range(Voice,Min,Max),
+	between(Min,Max,Note).
+
+writeNotes([])    :- nl.
+writeNotes([Note|T]) :-
+	note_name(Note, Name),
+	write(Name),write(' '),
+	writeNotes(T).

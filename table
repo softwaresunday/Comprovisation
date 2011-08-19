@@ -1,0 +1,50 @@
+% table/3
+% table( +Functor, +Start, +ListofLists) -> Functor(Start+N, NthName)...
+% table( foo, 5, [ [a,b,c], [1,2,3] ]).
+% produces:  foo(5, a1). foo(6, b1).foo(7, c1). ... foo(13,c3).
+
+
+% Example:
+% Create a table of MIDI notes from note_name(12, 'C0') to
+% noteName(148,'B10').  Note sublist syntax for aliases 
+% ( 'C#' and 'Db' will have the same index ).
+%
+% table(note_name, 12,
+%    [['C',['C#','Db'],'D',['D#','Eb'],'E','F',['F#','Gb'],
+%       'G',['G#','Ab'],'A',['A#','Bb'],'B'],
+%    [0,1,2,3,4,5,6,7,8,9,10]]).
+
+
+term_expansion(table(Functor, Start, List), Terms) :-
+  bagof(E, elements(List,E), Es),
+  bagof(T, table_items(Es, Functor, Start, T), Terms).
+
+elements([], []).
+elements([L|Ls],[E|Es]) :-  elements(Ls,Es), member(E,L).
+
+table_items([H|_], F, N, Term) :-
+	table_item(H, "", F, N, Term).
+
+table_items([_|T], F, N, Term) :-
+	NN is N+1,
+	table_items(T, F, NN, Term).
+
+table_item([], In, F, N, Term) :-
+	atom_chars(Atom,In),
+	Term =.. [F, N, Atom].
+
+table_item([H|T], In, F, N, Term) :-
+	one_or_many(H, M),
+	atom_chars(M, MCs),
+	append(In, MCs, ACs),
+	table_item(T, ACs, F, N, Term).
+
+one_or_many(Item,Item) :- atomic(Item).
+one_or_many(List,Item) :- member(Item,List).
+  
+%
+%midinotes(keyTone, 12,
+%    [ ['C', ['C#','Db'], 'D', ['D#','Eb'], 'E', 'F',['F#','Gb'],
+%       'G', ['G#','Ab'], 'A', ['A#','Bb'], 'B'],
+%    [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ] ]).
+%

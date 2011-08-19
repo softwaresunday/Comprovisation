@@ -1,0 +1,91 @@
+:- use_module(notes).
+
+:- dynamic key/1.
+:- dynamic scale/1.
+
+select(S,[S|T],T).
+select(S,[H|T],[H|NT]) :- select(S,T,NT).
+ 
+triad(dim,3,6). % Third and Fifth spacing for each type of triad
+triad(min,3,7).
+triad(maj,4,7).
+triad(aug,4,8).
+
+octave(0).      % A voice might span three octaves.
+octave(1).
+octave(2).
+
+tone_triad(1,maj) :- scale(maj).
+tone_triad(2,min) :- scale(maj).
+tone_triad(3,min) :- scale(maj).
+tone_triad(4,maj) :- scale(maj).
+tone_triad(5,maj) :- scale(maj).
+tone_triad(6,min) :- scale(maj).
+tone_triad(7,dim) :- scale(maj).
+
+tone_triad(1,min) :- scale(min).
+tone_triad(2,min) :- scale(min).
+tone_triad(3,maj) :- scale(min).
+tone_triad(4,maj) :- scale(min).
+tone_triad(5,maj) :- scale(min).
+tone_triad(6,dim) :- scale(min).
+tone_triad(7,maj) :- scale(min).
+
+tone_triad(1,min) :- scale(harmonic).
+tone_triad(2,dim) :- scale(harmonic).
+tone_triad(3,maj) :- scale(harmonic).
+tone_triad(4,maj) :- scale(harmonic).
+tone_triad(5,maj) :- scale(harmonic).
+tone_triad(6,min) :- scale(harmonic).
+tone_triad(7,maj) :- scale(harmonic).
+
+% Generate all valid chords from a Bass note.
+% chord( -Soprano, -Alto, -Tenor, +Bass)
+
+chord(Soprano,Alto,Tenor,Bass) :-
+	key(Key),
+	note_name(N, Key),
+	Tonic is mod(N,12),
+        Tone is ( mod(Bass + Tonic,12) + 1)//2 + 1,
+	tone_triad(Tone, Triad),
+	writeln(debug(tone(Tone),tonic(Tonic),triad(Triad))),
+	triad(Triad, Third, Fifth),
+        ThirdNote is Tonic + Third,
+        FifthNote is Tonic + Fifth,
+        !,
+	selectVoice(s, Soprano, [Tonic,ThirdNote,FifthNote], Next),
+	selectVoice(a, Alto,  Next,  Final),
+	selectVoice(t, Tenor, Final,  _),
+
+	Soprano >= Alto,                 
+	Alto >= Tenor,      % No voice crossing
+	Tenor >= Bass.
+
+selectVoice(Type, Voice, Choices, Rest) :-
+	range(Type, Minimum, Maximum),
+	select(Offset, Choices, Rest),
+	octave(Oct),
+	Voice is (Minimum-mod(Minimum,12)) + Oct*12 + Offset,
+	between(Minimum, Maximum, Voice).
+ 
+testProc :-
+	process_create( path(perl),
+			[midi],
+			[stdin(pipe(MidiIn)),stdout(std)]),
+        tell(MidiIn),
+
+	member(B,[38, 40,35,42,48]),
+
+	chord( S, A, T, B),   % Many Solutions for each bass note
+
+	writeln(c(S,A,T,B)),  % Send chord to midi device
+	once(writeNotes([S,A,T,B])), % Debug output
+
+	flush_output,
+	sleep(0.3),
+	fail.                 % Retry for all legal chords
+
+:- assert(key('C#0')),
+   assert(scale(min)),
+   set_range(wide),
+  ( testProc ; true ).

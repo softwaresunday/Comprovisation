@@ -1,0 +1,74 @@
+#!C:/Perl/bin/perl.exe -w
+# Perl MIDI Server to be run from within swi prolog:
+#
+# :- process_create(path(perl),[midi],[stdin(pipe(MidiIn)),stdout(std)]),
+#    tell(MidiIn),
+#    writeNotes([60,64,67,71]).   % CMaj7th
+
+$|++;
+
+use Win32;
+use Win32::MIDI;
+my %notesOn;
+my $debug = 0;
+
+    for (<@ARGV>) { if (/-d/) { $debug = 1; } }
+    my $midi_obj = Win32::MIDI->new();
+    $midi_obj->openDevice(0);
+#   patch(51);
+
+    while(<>)
+    {
+      if (/([0-9]+),([0-9]+),([0-9]+),([0-9]+)/)
+	{
+	  for my $n (keys(%notesOn))   # Silence previous notes
+	  {
+	     if ($notesOn{$n}) { noteOff($n); }
+	  }
+	  print "soprano($1) alto($2) tenor($3) bass($4)\n" if ($debug);
+	  arpeggio($1,$2,$3,$4);
+	}
+      elsif (/^debug/) { print $_ if ($debug); }
+      else               { print $_; }
+    }
+    $midi_obj->closeDevice() if ($midi_obj);
+
+sub noteOn {
+    my ( $n, $a ) = @_;
+    midi(0x90, 0, $n, $a);
+    $notesOn{$n} = 1;
+}
+
+sub noteOff {
+    my $n = shift;
+    midi(0x80, 0, $n, 80);
+    $notesOn{$n} = 0;
+}
+
+sub patch {
+   midi(0xC0, 0, (shift));
+}
+
+sub midi {
+        my $cmd = shift;
+	my $n = 0;
+        while (<@_>) { $cmd |= ($_)<<$n; $n += 8; }
+        $midi_obj->writeMIDI($cmd) if ($midi_obj);
+}
+
+sub arpeggio {
+  my ($S,$A,$T,$B) = @_;
+    noteOn($S, 60);
+  select(undef, undef, undef, 0.1),
+    noteOn($A, 50);
+  select(undef, undef, undef, 0.1),
+    noteOn($T, 50);
+  select(undef, undef, undef, 0.1),
+    noteOn($B, 80);
+  select(undef, undef, undef, 0.1),
+    noteOn($T, 50);
+  select(undef, undef, undef, 0.1),
+    noteOn($A, 50);
+  select(undef, undef, undef, 0.1),
+    noteOn($S, 60);
+}
