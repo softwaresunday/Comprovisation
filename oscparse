@@ -1,0 +1,137 @@
+% Parse OSC messages from a list of codes
+
+:- module(oscparse, [osc_parse/2]).
+
+:- dynamic debug/0.
+debug.
+
+osc_parse(C,List) :- posc(C,List,[]),!, debug -> printOsc(C); true.
+
+% BUNDLES
+posc(bundle(Time,Elements)) -->
+	string('#bundle'),
+	data_type(time, Time),
+	elements(Elements).
+
+% COMMANDS
+posc(command(Command,Types,Data)) -->
+	string(Command),
+	",",
+	types(Types, 1), % count the "," as 1 
+	data(Types, Data).
+
+
+elements([element(Size,Data)|Es]) -->  % Bundles contain Elements
+	integer(Size),
+	collect(Size,Data),
+	elements(Es).
+elements([])     --> [].
+
+% Counter ensures that 4 byte multiples are consumed
+
+types([Type|Types],N) -->
+	type(Type),
+	{ NN is N+1 },
+	types(Types,NN).
+types([],N) -->
+	{ Rem is mod(4-mod(N,4),4) },
+	consume(Rem).
+
+type(int)   --> "i". % 32-bit integer
+type(float) --> "f". % 32-bit float
+type(string)--> "s". % Null terminated String (arg length is multiple of 4)
+type(blob)  --> "b". % Data blob
+type(int64) --> "h". % 64 bit big-endian two's complement integer
+type(time)  --> "t". % OSC-timetag  (8 bytes)
+type(double)--> "d". % 64 bit double IEEE 754 floating point numbera
+type(string)--> "S". % Alternate string (e.g. "symbols" vs. "strings")
+type(char)  --> "c". % ASCII char sent as 32 bits
+type(rgb32) --> "r". % 32 bit RGBA color
+type(midi)  --> "m". % MIDI: MSB to LSB: port id, status byte, data1, data2
+type(true)  --> "T". % True. No bytes are allocated in the argument data.
+type(false) --> "F". % False. No bytes are allocated in the argument data.
+type(nil)   --> "N". % Nil. No bytes are allocated in the argument data.
+type(array) --> "[". % The beginning of an array of type tags
+type(earray)--> "]". % The end of an array of tags
+type(infinitum) --> "I". % Infinitum. No bytes in the argument data.
+
+
+data([],[])         --> [].
+data([T|Ts],[V|Vs]) -->	data_type(T, V), data(Ts, Vs).
+
+data_type(int, Value)   --> integer(Value).
+data_type(float, Value) --> float(Value).
+data_type(string, Atom) --> string(Atom).
+data_type(midi, midi(Port,Cmd,D1,D2)) --> [ Port, Cmd, D1, D2 ].
+data_type(time, time(Bytes)) --> collect(8, Bytes).
+
+data_type(blob, blob(N,Contents)) -->
+	integer(N),
+	collect(N, Contents).
+
+string(Atom) --> string(Cs, 0), { atom_chars(Atom,Cs) }.
+
+string([C|Cs],N) --> [C], { C =\= 0, NN is N+1 }, string(Cs,NN).
+string(    [],N) --> { Rem is mod(4-mod(N,4),4) }, consume(Rem).
+
+consume(0) --> !.
+consume(N) --> [_], { NN is N-1 }, consume(NN).
+
+collect(0,     []) --> !.
+collect(N, [C|Cs]) --> [C], { NN is N-1 }, collect(NN, Cs).
+
+% PARSING NUMBERS
+% Parse four bytes as integer or floating point number.
+
+integer(Value) --> [ A, B, C, D ],
+		   {  Value is (A<<24)+(B<<16)+(C<<8)+D  }.
+
+%  S EEEEEEEE FFFFFFFFFFFFFFFFFFFFFFF
+%  0 1      8 9                    31
+
+float(Value) --> [ A, B, C, D ],
+	{
+		Exp is ((A/\127)<<1)\/(B>>7),
+		addfractions(8, D, 0, LSB),
+		addfractions(8, C, LSB, MSB),
+		addfractions(7, B, MSB, Mantissa),
+		floatValue(Exp, Mantissa, AValue),
+		(A>>7 =:= 0 -> Value = AValue ; Value is -AValue)
+	}.
+
+addfractions(0,    _, In, In)  :- !.
+addfractions(N, Bits, In, Out) :-
+	( (Bits /\ 1 =:= 1) -> Next is 1 + In/2 ; Next is In/2),
+	NewBits is Bits >> 1,
+	NN is N-1,
+	addfractions(NN, NewBits, Next, Out).
+
+% If E=255 and Mantissa is nonzero, then V=NaN ("Not a number")
+floatValue(255,Mantissa,nAn) :- Mantissa > 0, !.
+
+% If E=255 and Mantissa is zero and S is 1, then V=-Infinity
+floatValue(255, Mantissa, infinity) :- Mantissa =:= 0, !.
+
+% If E=255 and Mantissa is zero and S is 0, then V=Infinity
+floatValue(255, Mantissa, infinity) :- Mantissa =:= 0, !.
+
+% If 0<E<255 then V=(sign) 2 ** (E-127) * (1.F)
+floatValue(Exp, Mantissa, AValue) :-
+	Mantissa > 0, !,
+	AValue is (1.0 + (Mantissa/2.0) ) * 2**(Exp-127).
+
+% If E=0 and F is nonzero, then V= 2 ** (-126) * (0.F)
+floatValue(0, Mantissa, AValue) :-
+	Mantissa > 0, !,
+	AValue is Mantissa/( 2**126 ).
+
+%  If E=0 and F is zero and S is 1(0), then V=-(+)0
+floatValue(0,0,0.0) :- !.
+
+
+printOsc(command(Command, Types, Data)) :- !,
+	format('~q( ~w,  ~w )~n',[Command, Types, Data]).
+printOsc(bundle(Size, _Elements)) :- !,
+	format('Bundle( ~w )~n',[Size]).
+printOsc(X) :-
+	format('unknown OSC ( ~w )~n',[X]).

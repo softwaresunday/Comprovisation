@@ -1,0 +1,20 @@
+:- use_module(library(socket)).
+:- use_module(oscparse).
+
+receive(Port) :-
+        udp_socket(Socket),
+        tcp_bind(Socket, Port),
+        repeat,
+            udp_receive(Socket, Read, _From, [as(codes)]),
+	    osc_parse(Osc, Read),
+	    ( Osc=command('/quit',_,_) -> halt ; true),
+        fail.
+
+:- receive(7000).
+
+
+
+
+
+
+
